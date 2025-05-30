@@ -1,8 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:snowy/elements/containerastro.dart';
+import 'package:snowy/elements/navbar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,6 +17,11 @@ class _HomeState extends State<Home> {
   String temperature = '';
   String condition = '';
   String iconUrl = '';
+  String sunrise = '';
+  String sunset = '';
+  String moonrise = '';
+  String moonset = '';
+  bool isLoading = true;
 
   String getWeatherIcon(String condition) {
     switch (condition.toLowerCase()) {
@@ -27,8 +33,13 @@ class _HomeState extends State<Home> {
         return 'assets/images/rainy-day.png';
       case 'snowy':
         return 'assets/images/snowman.png';
+      case 'patchy rain nearby':
+        return 'assets/images/patchyrain.png';
+  case'clear':
+        return 'assets/images/clear.png';
+
       default:
-        return 'assets/images/weather-news.png'; 
+        return 'assets/images/Forgot_to_add_Icon_for_this_weather-removebg-preview.png';
     }
   }
 
@@ -37,6 +48,8 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    print('Condition from API: $condition');
+
     getWeatherForCurrentLocation();
   }
 
@@ -49,7 +62,6 @@ class _HomeState extends State<Home> {
 
     if (permission != LocationPermission.whileInUse &&
         permission != LocationPermission.always) {
-      // Handle the case where location permission is not granted
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Color(0xffdaedef),
@@ -62,16 +74,14 @@ class _HomeState extends State<Home> {
       return;
     }
 
-    // ✅ This should be inside the permission block
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
     double lat = position.latitude;
     double lon = position.longitude;
 
-    print('Latitude: $lat, Longitude: $lon');
     Uri url = Uri.parse(
-      'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$lat,$lon&aqi=no',
+      'http://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$lat,$lon&days=1&aqi=no&alerts=no',
     );
 
     var response = await http.get(url);
@@ -82,6 +92,11 @@ class _HomeState extends State<Home> {
         temperature = '${data['current']['temp_c']}°C';
         condition = data['current']['condition']['text'];
         iconUrl = data['current']['condition']['icon'];
+        sunrise = data['forecast']['forecastday'][0]['astro']['sunrise'];
+        sunset = data['forecast']['forecastday'][0]['astro']['sunset'];
+        moonrise = data['forecast']['forecastday'][0]['astro']['moonrise'];
+        moonset = data['forecast']['forecastday'][0]['astro']['moonset'];
+        isLoading = false;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -101,9 +116,9 @@ class _HomeState extends State<Home> {
     return Scaffold(
       backgroundColor: const Color(0XFFdaedef),
       appBar: AppBar(
-        backgroundColor: Color(0XFFdaedef),
+        backgroundColor: const Color(0XFFdaedef),
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Snowy',
           style: TextStyle(
             color: Colors.black,
@@ -113,86 +128,145 @@ class _HomeState extends State<Home> {
         ),
       ),
       drawer: Drawer(),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          color: Color(0xfff3f4f5),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
-                width: 350,
-                height: 600,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(100),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white,
-                      offset: Offset(-6, -6),
-                      spreadRadius: 1,
-                      blurRadius: 15,
+      body:
+          isLoading
+              ? const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.blueGrey,
+                  strokeWidth: 3,
+                ),
+              )
+              : Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Color(0xfff3f4f5),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        width: 350,
+                        height: 600,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(100),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white,
+                              offset: Offset(-6, -6),
+                              spreadRadius: 1,
+                              blurRadius: 15,
+                            ),
+                            BoxShadow(
+                              color: Color(0xffd1d5db),
+                              offset: Offset(6, 6),
+                              spreadRadius: 1,
+                              blurRadius: 15,
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: Column(
+                            children: [
+                              Text(
+                                ' $condition',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                temperature,
+                                style: const TextStyle(
+                                  fontSize: 100,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              iconUrl.isNotEmpty
+                                  ? Container(
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.pink.withOpacity(0.5),
+                                          blurRadius: 30,
+                                          spreadRadius: 5,
+                                          offset: Offset(0, 0),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Image.asset(
+                                      getWeatherIcon(condition),
+                                      width: 200,
+                                      height: 200,
+                                    ),
+                                  )
+                                  : const SizedBox(height: 200),
+                              const SizedBox(height: 40),
+                              Text(
+                                city,
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    BoxShadow(
-                      color: Color(0xffd1d5db),
-                      offset: Offset(6, 6),
-                      spreadRadius: 1,
-                      blurRadius: 15,
+                    const SizedBox(height: 20),
+                    Containerastro(
+                      label: 'Sunrise',
+                      time: sunrise,
+                      imagePath: 'assets/images/sunrise.png',
+                      glowColor: Colors.orange,
+                    ),
+                    Containerastro(
+                      label: 'Sunset',
+                      time: sunset,
+                      imagePath: 'assets/images/sunset.png',
+                      glowColor: Colors.orange,
+                    ),
+                    Containerastro(
+                      label: 'Moonrise',
+                      time: moonrise,
+                      imagePath: 'assets/images/moonrise.png',
+                      glowColor: Colors.blue,
+                    ),
+                    Containerastro(
+                      label: 'Moonset',
+                      time: moonset,
+                      imagePath: 'assets/images/moonset.png',
+                      glowColor: Colors.blue,
+                    ),
+                    const SizedBox(height: 20),
+                    const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Weather data provided by WeatherAPI.com',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
                     ),
                   ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Column(
-                    children: [
-                      Text(
-                        ' $condition',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 25, color: Colors.grey[400]),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(temperature,
-                        style: const TextStyle(
-                          fontSize: 100,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      if(iconUrl.isNotEmpty)
-                        Image.asset(
-                          getWeatherIcon(condition),
-                          width: 100,
-                          height: 200,
-                        ),
-                      const SizedBox(height: 10),
-                      Text(
-                        city,
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  
                 
                 ),
-              
+                
               ),
-              
-            ),
-          ],
-        ),
-      ),
+             bottomNavigationBar: const BottomContainer(),
+
     );
   }
 }
