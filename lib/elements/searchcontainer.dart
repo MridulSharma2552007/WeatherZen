@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snowy/elements/containerastro.dart';
 
 class Searchcontainer extends StatelessWidget {
   final String label;       // condition
@@ -14,6 +15,7 @@ class Searchcontainer extends StatelessWidget {
     required this.imagePath,
     required this.glowColor,
     required this.city,
+    
   });
 
   @override
@@ -109,9 +111,11 @@ class Searchcontainer extends StatelessWidget {
                     ),
                   ],
                 ),
+
               ),
             ),
-
+             const SizedBox(height: 20),
+                   
           ],
         ),
         
