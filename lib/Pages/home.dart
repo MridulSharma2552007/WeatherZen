@@ -131,7 +131,7 @@ class _HomeState extends State<Home> {
       drawer: Drawer(),
       body:
           isLoading
-              ? const Center(
+              ?  const Center(
                 child: CircularProgressIndicator(
                   color: Colors.blueGrey,
                   strokeWidth: 3,
@@ -140,12 +140,15 @@ class _HomeState extends State<Home> {
               : Container(
                 width: double.infinity,
                 height: double.infinity,
-                decoration: const BoxDecoration(
+                decoration:  BoxDecoration(
                   color: Color(0xfff3f4f5),
+                  
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
+                  
+                  
                 ),
                 child: ListView(
                   children: [

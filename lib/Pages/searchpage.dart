@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:snowy/elements/navbar.dart';
 import 'package:snowy/elements/searchcontainer.dart';
@@ -39,6 +40,12 @@ class _SearchpageState extends State<Searchpage> {
         return 'assets/images/clear.png';
       case 'partly cloudy':
         return 'assets/images/partly-cloudy.png';
+        case 'mist':
+        return'assets/images/mist.png';
+        case 'overcast':
+        return'assets/images/overcast.png';
+        case 'patchy light rain in area with thunder':
+        return'assets/images/stormy-cloud-with-rain-and-thunder.png';
       default:
         return 'assets/images/Forgot_to_add_Icon_for_this_weather-removebg-preview.png';
     }
@@ -112,12 +119,16 @@ class _SearchpageState extends State<Searchpage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration:  BoxDecoration(
           color: Color(0xfff3f4f5),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(30),
             topRight: Radius.circular(30),
           ),
+           border: Border.all(
+          
+          color: Colors.black
+         )
         ),
         child: Column(
           children: [
@@ -182,14 +193,14 @@ class _SearchpageState extends State<Searchpage> {
             if (isLoading)
               const Padding(
                 padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(),
+                child: SpinKitWaveSpinner(color: Color(0XFFdaedef),waveColor: Colors.white)
               )
             else if (city.isNotEmpty)
               Searchcontainer(
                 label: temperature,
                 time: condition,
                 imagePath: getWeatherIcon(condition),
-                glowColor: Colors.pink,
+                glowColor: const Color.fromARGB(255, 249, 126, 167),
                 city: city,
               ),
           ],
