@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
         return 'assets/images/snowman.png';
       case 'patchy rain nearby':
         return 'assets/images/patchyrain.png';
-  case'clear':
+      case 'clear':
         return 'assets/images/clear.png';
 
       default:
@@ -87,6 +87,7 @@ class _HomeState extends State<Home> {
     var response = await http.get(url);
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
+      if (!mounted) return;
       setState(() {
         city = data['location']['name'];
         temperature = '${data['current']['temp_c']}°C';
@@ -231,25 +232,25 @@ class _HomeState extends State<Home> {
                       label: 'Sunrise',
                       time: sunrise,
                       imagePath: 'assets/images/sunrise.png',
-                      glowColor: Colors.orange,
+                      glowColor: const Color.fromARGB(255, 239, 181, 94),
                     ),
                     Containerastro(
                       label: 'Sunset',
                       time: sunset,
                       imagePath: 'assets/images/sunset.png',
-                      glowColor: Colors.orange,
+                      glowColor: const Color.fromARGB(255, 108, 182, 243),
                     ),
                     Containerastro(
                       label: 'Moonrise',
                       time: moonrise,
                       imagePath: 'assets/images/moonrise.png',
-                      glowColor: Colors.blue,
+                      glowColor: const Color.fromARGB(255, 217, 138, 231),
                     ),
                     Containerastro(
                       label: 'Moonset',
                       time: moonset,
                       imagePath: 'assets/images/moonset.png',
-                      glowColor: Colors.blue,
+                      glowColor: const Color.fromARGB(255, 120, 208, 123),
                     ),
                     const SizedBox(height: 20),
                     const Padding(
@@ -261,12 +262,9 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                   ],
-                
                 ),
-                
               ),
-             bottomNavigationBar: const BottomContainer(),
-
+      bottomNavigationBar: const BottomContainer(),
     );
   }
 }

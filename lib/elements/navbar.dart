@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:snowy/Pages/home.dart';
-import 'package:snowy/Pages/search.dart';
+
+import 'package:snowy/Pages/searchpage.dart';
+import 'package:snowy/Pages/settings.dart';
 
 class BottomContainer extends StatelessWidget {
   const BottomContainer({super.key});
@@ -34,7 +36,7 @@ class BottomContainer extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Home()),
                 );
@@ -43,12 +45,23 @@ class BottomContainer extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Search()),
+                  MaterialPageRoute(builder: (context) => Searchpage()),
                 );
               },
-              icon: const Icon(Icons.search, color: Colors.black, size: 30),
+              icon: Icon(Icons.search),
+              color: Colors.black,
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Settings()),
+                );
+              },
+              icon: Icon(Icons.settings),
+              color: Colors.black,
             ),
           ],
         ),

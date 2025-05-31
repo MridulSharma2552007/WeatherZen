@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:snowy/Pages/home.dart';
-import 'package:snowy/elements/navbar.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
