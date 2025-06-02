@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snowy/elements/containerastro.dart';
+import 'package:snowy/elements/drawerelement.dart';
 import 'package:snowy/elements/navbar.dart';
 
 class Home extends StatefulWidget {
@@ -14,7 +16,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String city = '';
-  String temperature = '';
+  double tempCelsius = 0.0;
+
   String condition = '';
   String iconUrl = '';
   String sunrise = '';
@@ -22,6 +25,9 @@ class _HomeState extends State<Home> {
   String moonrise = '';
   String moonset = '';
   bool isLoading = true;
+  String windSpeed = '';
+  bool tempIn = false;
+  String temperature = '';
 
   String getWeatherIcon(String condition) {
     switch (condition.toLowerCase()) {
@@ -48,9 +54,18 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    print('Condition from API: $condition');
-
+    getSettings();
     getWeatherForCurrentLocation();
+  }
+
+  bool windEnabled = false;
+
+  void getSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      windEnabled = prefs.getBool('windEnabled') ?? false;
+      tempIn = prefs.getBool('tempIn') ?? false;
+    });
   }
 
   Future<void> getWeatherForCurrentLocation() async {
@@ -90,6 +105,7 @@ class _HomeState extends State<Home> {
       if (!mounted) return;
       setState(() {
         city = data['location']['name'];
+        tempCelsius = data['current']['temp_c'].toDouble();
         temperature = '${data['current']['temp_c']}°C';
         condition = data['current']['condition']['text'];
         iconUrl = data['current']['condition']['icon'];
@@ -97,6 +113,8 @@ class _HomeState extends State<Home> {
         sunset = data['forecast']['forecastday'][0]['astro']['sunset'];
         moonrise = data['forecast']['forecastday'][0]['astro']['moonrise'];
         moonset = data['forecast']['forecastday'][0]['astro']['moonset'];
+        windSpeed = '${data['current']['wind_kph']} km/h';
+
         isLoading = false;
       });
     } else {
@@ -114,13 +132,18 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    String displayTemp =
+        tempIn
+            ? '${((tempCelsius * 9 / 5) + 32).toStringAsFixed(1)}°F' // Fahrenheit
+            : '${tempCelsius.toStringAsFixed(1)}°C'; // Celsius
+
     return Scaffold(
       backgroundColor: const Color(0XFFdaedef),
       appBar: AppBar(
         backgroundColor: const Color(0XFFdaedef),
         elevation: 0,
         title: const Text(
-          'Snowy',
+          'WeatherZen',
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
@@ -128,10 +151,10 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      drawer: Drawer(),
+      drawer: Drawerelement(),
       body:
           isLoading
-              ?  const Center(
+              ? const Center(
                 child: CircularProgressIndicator(
                   color: Colors.blueGrey,
                   strokeWidth: 3,
@@ -140,15 +163,13 @@ class _HomeState extends State<Home> {
               : Container(
                 width: double.infinity,
                 height: double.infinity,
-                decoration:  BoxDecoration(
+                decoration: BoxDecoration(
                   color: Color(0xfff3f4f5),
-                  
+
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
-                  
-                  
                 ),
                 child: ListView(
                   children: [
@@ -189,13 +210,14 @@ class _HomeState extends State<Home> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                temperature,
+                                tempIn ? displayTemp : temperature,
                                 style: const TextStyle(
                                   fontSize: 100,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               ),
+
                               const SizedBox(height: 10),
                               iconUrl.isNotEmpty
                                   ? Container(
@@ -255,6 +277,13 @@ class _HomeState extends State<Home> {
                       imagePath: 'assets/images/moonset.png',
                       glowColor: const Color.fromARGB(255, 120, 208, 123),
                     ),
+                    if (windEnabled)
+                      Containerastro(
+                        label: 'WindSpeed',
+                        time: windSpeed,
+                        imagePath: 'assets/images/windsock_6288895.png',
+                        glowColor: Colors.blue,
+                      ),
                     const SizedBox(height: 20),
                     const Padding(
                       padding: EdgeInsets.all(10),

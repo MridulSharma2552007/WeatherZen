@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           const SizedBox(height: 20),
           const Text(
-            'Welcome to Snowy',
+            'Welcome to WeatherZen',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,

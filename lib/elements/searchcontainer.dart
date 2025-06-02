@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:snowy/elements/containerastro.dart';
 
 class Searchcontainer extends StatelessWidget {
   final String label;       // condition

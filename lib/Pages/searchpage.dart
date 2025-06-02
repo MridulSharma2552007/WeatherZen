@@ -51,6 +51,7 @@ class _SearchpageState extends State<Searchpage> {
         return 'assets/images/overcast.png';
       case 'patchy light rain in area with thunder':
         return 'assets/images/stormy-cloud-with-rain-and-thunder.png';
+        
       default:
         return 'assets/images/Forgot_to_add_Icon_for_this_weather-removebg-preview.png';
     }
@@ -113,7 +114,8 @@ class _SearchpageState extends State<Searchpage> {
   }
 
  
-Widget build(BuildContext context) {
+@override
+  Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: const Color(0XFFdaedef),
     appBar: AppBar(
