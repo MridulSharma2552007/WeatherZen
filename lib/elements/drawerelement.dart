@@ -45,7 +45,7 @@ class Drawerelement extends StatelessWidget {
             title: Text('Developer: Mridul Sharma'),
             subtitle: Text('Tap to view GitHub'),
             onTap: () {
-              launchUrl(Uri.parse('https://github.com/akira2552007'));
+              launchUrl(Uri.parse('https://github.com/MridulSharma2552007'));
             },
           ),
 
